@@ -46,8 +46,8 @@ export default async function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            // src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop"
-            src="PICKLEBALLBACKGROUND.avif"
+            src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=2070&auto=format&fit=crop"
+            // src="PICKLEBALLBACKGROUND.avif"
             alt="Pickleball Court Background"
             className="w-full h-full object-cover opacity-80"
           />
