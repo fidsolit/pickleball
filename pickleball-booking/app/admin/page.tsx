@@ -2,6 +2,16 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "@/components/LogoutButton";
+import {
+  Trophy,
+  Calendar,
+  Users,
+  Grid,
+  Clock,
+  Eye,
+  ArrowUpRight,
+  TrendingUp,
+} from "lucide-react";
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
@@ -86,349 +96,279 @@ export default async function AdminDashboardPage() {
     .limit(10);
 
   return (
-    <main className="min-h-screen bg-gray-100">
-
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       {/* HEADER */}
-      <header className="border-b bg-white">
+      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-
-          <div>
-            <h1 className="text-xl font-bold">
-              Pickleball Admin
-            </h1>
-
-            <p className="text-sm text-gray-500">
-              Administration Dashboard
-            </p>
+          <div className="flex items-center gap-3">
+            <span className="bg-lime-500 text-slate-950 p-1.5 rounded-lg">
+              <Trophy className="w-5 h-5" />
+            </span>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                FCODES <span className="text-lime-400">ADMIN</span>
+              </h1>
+              <p className="text-xs text-slate-400">Facility Operations Management</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
-
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-semibold text-slate-200">
                 {profile.full_name || user.email}
               </p>
-
-              <p className="text-xs text-gray-500">
-                Administrator
-              </p>
+              <p className="text-xs text-lime-400 font-medium">System Administrator</p>
             </div>
-
             <LogoutButton />
-
           </div>
-
         </div>
       </header>
 
       {/* CONTENT */}
-      <div className="mx-auto max-w-7xl px-6 py-10">
-
+      <div className="mx-auto max-w-7xl px-6 py-10 w-full flex-1">
         {/* TITLE */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold">
-            Dashboard
+          <span className="inline-block px-3 py-1 mb-2 text-xs font-semibold uppercase tracking-wider text-lime-400 bg-lime-950/60 border border-lime-800/50 rounded-full">
+            Control Center
+          </span>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            Dashboard Overview
           </h2>
-
-          <p className="mt-2 text-gray-500">
-            Manage your pickleball facility.
+          <p className="mt-1 text-sm text-slate-400">
+            Monitor court activity, view real-time statistics, and manage system resources.
           </p>
         </div>
 
         {/* STATISTICS */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-
           {/* BOOKINGS */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Total Bookings
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition duration-300 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Total Bookings
+              </p>
+              <Calendar className="w-5 h-5 text-lime-400" />
+            </div>
+            <p className="mt-3 text-3xl font-extrabold text-white">
               {totalReservations ?? 0}
             </p>
-
-            <p className="mt-2 text-xs text-gray-400">
-              All reservations
-            </p>
+            <p className="mt-2 text-xs text-slate-500">All-time processed reservations</p>
           </div>
 
           {/* CUSTOMERS */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Customers
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition duration-300 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Customers
+              </p>
+              <Users className="w-5 h-5 text-lime-400" />
+            </div>
+            <p className="mt-3 text-3xl font-extrabold text-white">
               {totalCustomers ?? 0}
             </p>
-
-            <p className="mt-2 text-xs text-gray-400">
-              Registered customers
-            </p>
+            <p className="mt-2 text-xs text-slate-500">Registered active accounts</p>
           </div>
 
           {/* COURTS */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Courts
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition duration-300 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Active Courts
+              </p>
+              <Grid className="w-5 h-5 text-lime-400" />
+            </div>
+            <p className="mt-3 text-3xl font-extrabold text-white">
               {totalCourts ?? 0}
             </p>
-
-            <p className="mt-2 text-xs text-gray-400">
-              Total courts
-            </p>
+            <p className="mt-2 text-xs text-slate-500">Available facility courts</p>
           </div>
 
           {/* UPCOMING */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">
-              Upcoming
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition duration-300 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Upcoming
+              </p>
+              <Clock className="w-5 h-5 text-lime-400" />
+            </div>
+            <p className="mt-3 text-3xl font-extrabold text-white">
               {upcomingBookings ?? 0}
             </p>
-
-            <p className="mt-2 text-xs text-gray-400">
-              Upcoming reservations
-            </p>
+            <p className="mt-2 text-xs text-slate-500">Scheduled active bookings</p>
           </div>
-
         </div>
 
         {/* QUICK ACTIONS */}
         <div className="mt-10">
-
-          <h3 className="mb-5 text-xl font-bold">
-            Quick Actions
-          </h3>
-
+          <h3 className="mb-4 text-lg font-bold text-white">Quick Actions</h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
             <Link
               href="/admin/reservations"
-              className="rounded-xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              className="group rounded-xl border border-slate-800 bg-slate-900/60 p-5 transition duration-300 hover:border-lime-500/50 hover:bg-slate-900 flex flex-col justify-between"
             >
-              <div className="text-3xl">
-                📅
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="p-2 bg-slate-800 text-lime-400 rounded-lg group-hover:bg-lime-400 group-hover:text-slate-950 transition">
+                    <Calendar className="w-5 h-5" />
+                  </span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-lime-400 transition" />
+                </div>
+                <h4 className="font-bold text-white group-hover:text-lime-400 transition">
+                  Reservations
+                </h4>
+                <p className="mt-1 text-xs text-slate-400">
+                  Manage customer bookings & schedules
+                </p>
               </div>
-
-              <h4 className="mt-4 font-bold">
-                Reservations
-              </h4>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Manage customer bookings
-              </p>
             </Link>
 
             <Link
               href="/admin/courts"
-              className="rounded-xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              className="group rounded-xl border border-slate-800 bg-slate-900/60 p-5 transition duration-300 hover:border-lime-500/50 hover:bg-slate-900 flex flex-col justify-between"
             >
-              <div className="text-3xl">
-                🏓
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="p-2 bg-slate-800 text-lime-400 rounded-lg group-hover:bg-lime-400 group-hover:text-slate-950 transition">
+                    <Grid className="w-5 h-5" />
+                  </span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-lime-400 transition" />
+                </div>
+                <h4 className="font-bold text-white group-hover:text-lime-400 transition">
+                  Courts
+                </h4>
+                <p className="mt-1 text-xs text-slate-400">
+                  Configure pickleball courts & rates
+                </p>
               </div>
-
-              <h4 className="mt-4 font-bold">
-                Courts
-              </h4>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Manage pickleball courts
-              </p>
             </Link>
 
             <Link
               href="/admin/users"
-              className="rounded-xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              className="group rounded-xl border border-slate-800 bg-slate-900/60 p-5 transition duration-300 hover:border-lime-500/50 hover:bg-slate-900 flex flex-col justify-between"
             >
-              <div className="text-3xl">
-                👥
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="p-2 bg-slate-800 text-lime-400 rounded-lg group-hover:bg-lime-400 group-hover:text-slate-950 transition">
+                    <Users className="w-5 h-5" />
+                  </span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-lime-400 transition" />
+                </div>
+                <h4 className="font-bold text-white group-hover:text-lime-400 transition">
+                  Customers
+                </h4>
+                <p className="mt-1 text-xs text-slate-400">
+                  Manage registered users & access
+                </p>
               </div>
-
-              <h4 className="mt-4 font-bold">
-                Customers
-              </h4>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Manage registered users
-              </p>
             </Link>
 
             <Link
               href="/courts"
-              className="rounded-xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              className="group rounded-xl border border-slate-800 bg-slate-900/60 p-5 transition duration-300 hover:border-lime-500/50 hover:bg-slate-900 flex flex-col justify-between"
             >
-              <div className="text-3xl">
-                👀
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="p-2 bg-slate-800 text-lime-400 rounded-lg group-hover:bg-lime-400 group-hover:text-slate-950 transition">
+                    <Eye className="w-5 h-5" />
+                  </span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-lime-400 transition" />
+                </div>
+                <h4 className="font-bold text-white group-hover:text-lime-400 transition">
+                  View Site
+                </h4>
+                <p className="mt-1 text-xs text-slate-400">
+                  Preview public booking page
+                </p>
               </div>
-
-              <h4 className="mt-4 font-bold">
-                View Website
-              </h4>
-
-              <p className="mt-1 text-sm text-gray-500">
-                View customer booking page
-              </p>
             </Link>
-
           </div>
-
         </div>
 
         {/* TODAY'S BOOKINGS */}
         <div className="mt-10">
-
-          <div className="mb-5 flex items-center justify-between">
-
+          <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold">
-                Today's Reservations
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                {today}
-              </p>
+              <h3 className="text-lg font-bold text-white">Today's Reservations</h3>
+              <p className="text-xs text-slate-400">Schedule for {today}</p>
             </div>
-
             <Link
               href="/admin/reservations"
-              className="text-sm font-semibold text-green-600 hover:underline"
+              className="text-xs font-semibold text-lime-400 hover:text-lime-300 flex items-center gap-1 transition"
             >
-              View All
+              View All <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
-
           </div>
 
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-
+          <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
             {todayBookings && todayBookings.length > 0 ? (
-
               <div className="overflow-x-auto">
-
-                <table className="w-full text-left text-sm">
-
-                  <thead className="border-b bg-gray-50">
+                <table className="w-full text-left text-sm text-slate-300">
+                  <thead className="border-b border-slate-800 bg-slate-950/50 text-xs text-slate-400 uppercase tracking-wider">
                     <tr>
-                      <th className="px-6 py-4 font-semibold">
-                        Booking
-                      </th>
-
-                      <th className="px-6 py-4 font-semibold">
-                        Customer
-                      </th>
-
-                      <th className="px-6 py-4 font-semibold">
-                        Court
-                      </th>
-
-                      <th className="px-6 py-4 font-semibold">
-                        Time
-                      </th>
-
-                      <th className="px-6 py-4 font-semibold">
-                        Amount
-                      </th>
-
-                      <th className="px-6 py-4 font-semibold">
-                        Status
-                      </th>
+                      <th className="px-6 py-3.5 font-semibold">Booking Ref</th>
+                      <th className="px-6 py-3.5 font-semibold">Customer</th>
+                      <th className="px-6 py-3.5 font-semibold">Court</th>
+                      <th className="px-6 py-3.5 font-semibold">Time</th>
+                      <th className="px-6 py-3.5 font-semibold">Amount</th>
+                      <th className="px-6 py-3.5 font-semibold">Status</th>
                     </tr>
                   </thead>
-
-                  <tbody>
-
+                  <tbody className="divide-y divide-slate-800">
                     {todayBookings.map((booking: any) => (
-
                       <tr
                         key={booking.id}
-                        className="border-b last:border-0 hover:bg-gray-50"
+                        className="hover:bg-slate-800/40 transition duration-150"
                       >
-
-                        <td className="px-6 py-4 font-medium">
+                        <td className="px-6 py-4 font-mono text-xs font-medium text-lime-400">
                           {booking.booking_reference}
                         </td>
-
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 font-medium text-white">
                           {booking.profiles?.full_name ||
                             booking.profiles?.email ||
                             "Unknown"}
                         </td>
-
-                        <td className="px-6 py-4">
-                          {booking.courts?.name || "-"}
+                        <td className="px-6 py-4">{booking.courts?.name || "-"}</td>
+                        <td className="px-6 py-4 text-slate-400">
+                          {booking.time_slots?.start_time} - {booking.time_slots?.end_time}
                         </td>
-
-                        <td className="px-6 py-4">
-                          {booking.time_slots?.start_time} -
-                          {" "}
-                          {booking.time_slots?.end_time}
+                        <td className="px-6 py-4 font-semibold text-white">
+                          ₱{Number(booking.total_amount).toLocaleString()}
                         </td>
-
-                        <td className="px-6 py-4 font-semibold">
-                          ₱
-                          {Number(
-                            booking.total_amount
-                          ).toLocaleString()}
-                        </td>
-
                         <td className="px-6 py-4">
-
                           <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${
                               booking.status === "confirmed"
-                                ? "bg-green-100 text-green-700"
+                                ? "bg-emerald-950 text-emerald-400 border-emerald-800/50"
                                 : booking.status === "cancelled"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-yellow-100 text-yellow-700"
+                                ? "bg-rose-950 text-rose-400 border-rose-800/50"
+                                : "bg-amber-950 text-amber-400 border-amber-800/50"
                             }`}
                           >
                             {booking.status}
                           </span>
-
                         </td>
-
                       </tr>
-
                     ))}
-
                   </tbody>
-
                 </table>
-
               </div>
-
             ) : (
-
-              <div className="p-10 text-center">
-
-                <div className="text-4xl">
-                  📅
-                </div>
-
-                <h4 className="mt-4 font-semibold">
-                  No reservations today
-                </h4>
-
-                <p className="mt-1 text-sm text-gray-500">
-                  There are no bookings scheduled for today.
+              <div className="p-12 text-center">
+                <Calendar className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                <h4 className="font-semibold text-white">No reservations today</h4>
+                <p className="mt-1 text-xs text-slate-400">
+                  There are no customer bookings scheduled for today.
                 </p>
-
               </div>
-
             )}
-
           </div>
-
         </div>
-
       </div>
 
+      {/* FOOTER */}
+      <footer className="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-500 mt-auto">
+        © {new Date().getFullYear()} FCODES Pickleball Booking. Admin System.
+      </footer>
     </main>
   );
 }
