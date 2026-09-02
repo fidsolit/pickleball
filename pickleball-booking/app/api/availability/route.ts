@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+type BookedSlot = { time_slot_id: string };
+
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const parsed = new Date(`${value}T00:00:00`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(value);
+}
+
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
@@ -17,9 +29,9 @@ export async function GET(request: NextRequest) {
   const courtId = searchParams.get("courtId");
   const date = searchParams.get("date");
 
-  if (!courtId || !date) {
+  if (!courtId || !date || !uuidPattern.test(courtId) || !isValidDate(date)) {
     return NextResponse.json(
-      { error: "courtId and date are required" },
+      { error: "A valid court and date are required." },
       { status: 400 },
     );
   }
@@ -28,19 +40,18 @@ export async function GET(request: NextRequest) {
   const { data: timeSlots, error: slotsError } = await supabase
     .from("time_slots")
     .select("id, start_time, end_time, status")
+    .eq("status", "active")
     .order("start_time");
 
   if (slotsError) {
     return NextResponse.json({ error: slotsError.message }, { status: 500 });
   }
 
-  // Get bookings for this court and date
-  const { data: reservations, error: reservationError } = await supabase
-    .from("reservations")
-    .select("time_slot_id, status")
-    .eq("court_id", courtId)
-    .eq("reservation_date", date)
-    .neq("status", "cancelled");
+  // The RPC returns only occupied slot IDs, keeping customer details private.
+  const { data: reservations, error: reservationError } = await supabase.rpc(
+    "booked_time_slots",
+    { p_court_id: courtId, p_reservation_date: date },
+  );
 
   if (reservationError) {
     return NextResponse.json(
@@ -50,7 +61,9 @@ export async function GET(request: NextRequest) {
   }
 
   const bookedSlotIds = new Set(
-    (reservations || []).map((reservation) => reservation.time_slot_id),
+    ((reservations || []) as BookedSlot[]).map(
+      (reservation) => reservation.time_slot_id,
+    ),
   );
 
   const result = (timeSlots || []).map((slot) => ({

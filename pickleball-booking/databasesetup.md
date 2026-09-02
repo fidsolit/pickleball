@@ -392,6 +392,33 @@ $$
 ;
 
 -- ============================================================
+-- SAFE AVAILABILITY LOOKUP
+-- ============================================================
+
+-- Customers must not be able to read other customers' reservation details.
+-- This exposes only occupied time-slot IDs for a chosen court and date.
+create or replace function public.booked_time_slots(
+    p_court_id uuid,
+    p_reservation_date date
+)
+returns table (time_slot_id uuid)
+language sql
+security definer
+stable
+set search_path = public
+as
+$$
+    select r.time_slot_id
+    from public.reservations r
+    where r.court_id = p_court_id
+      and r.reservation_date = p_reservation_date
+      and r.status <> 'cancelled';
+$$;
+
+revoke all on function public.booked_time_slots(uuid, date) from public;
+grant execute on function public.booked_time_slots(uuid, date) to authenticated;
+
+-- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
 

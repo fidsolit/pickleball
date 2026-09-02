@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 type BookingInput = {
   courtId: string;
@@ -8,11 +9,32 @@ type BookingInput = {
   timeSlotId: string;
 };
 
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const date = new Date(`${value}T00:00:00`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
+}
+
 export async function createBooking({
   courtId,
   reservationDate,
   timeSlotId,
 }: BookingInput) {
+  if (
+    !uuidPattern.test(courtId) ||
+    !uuidPattern.test(timeSlotId) ||
+    !isValidDate(reservationDate)
+  ) {
+    return {
+      success: false,
+      message: "Please choose a valid court, date, and time slot.",
+    };
+  }
+
   const supabase = await createClient();
 
   // Get logged-in user
@@ -66,19 +88,13 @@ export async function createBooking({
     .from("time_slots")
     .select("id, start_time, end_time, status")
     .eq("id", timeSlotId)
+    .eq("status", "active")
     .single();
 
   if (timeSlotError || !timeSlot) {
     return {
       success: false,
       message: "Time slot not found.",
-    };
-  }
-
-  if (timeSlot.status !== "available") {
-    return {
-      success: false,
-      message: "This time slot is unavailable.",
     };
   }
 
@@ -133,9 +149,22 @@ export async function createBooking({
 
     return {
       success: false,
-      message: reservationError.message,
+      message: "Unable to create the reservation. Please try again.",
     };
   }
+
+  if (
+    reservationDate === new Date().toISOString().slice(0, 10) &&
+    new Date(`${reservationDate}T${timeSlot.start_time}`) <= new Date()
+  ) {
+    return {
+      success: false,
+      message: "This time slot has already started. Please select a later time.",
+    };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/courts/${courtId}`);
 
   return {
     success: true,

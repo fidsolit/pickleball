@@ -64,7 +64,12 @@ export default async function CourtBookingPage({ params }: PageProps) {
       status
     `,
     )
+    .eq("status", "active")
     .order("start_time");
+
+  const branch = Array.isArray(court.branches)
+    ? court.branches[0]
+    : court.branches;
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -121,9 +126,9 @@ export default async function CourtBookingPage({ params }: PageProps) {
                 <div>
                   <h1 className="text-3xl font-bold">{court.name}</h1>
 
-                  {court.branches && (
+                  {branch && (
                     <p className="mt-2 text-gray-500">
-                      📍 {court.branches.name}
+                      📍 {branch.name}
                     </p>
                   )}
                 </div>
@@ -143,9 +148,9 @@ export default async function CourtBookingPage({ params }: PageProps) {
                 </div>
               )}
 
-              {court.branches?.address && (
+              {branch?.address && (
                 <div className="mt-2 text-sm text-gray-500">
-                  {court.branches.address}
+                  {branch.address}
                 </div>
               )}
 

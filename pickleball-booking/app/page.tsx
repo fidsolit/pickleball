@@ -1,10 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import {
   Calendar,
-  MapPin,
-  ShieldCheck,
   Trophy,
   ArrowRight,
 } from "lucide-react";

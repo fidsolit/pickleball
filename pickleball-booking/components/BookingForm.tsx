@@ -98,14 +98,22 @@ export default function BookingForm({
 
     setLoadingBooking(true);
 
-    const result = await createBooking({
-      courtId: court.id,
-      reservationDate: date,
-      timeSlotId,
-    });
+    let result;
+
+    try {
+      result = await createBooking({
+        courtId: court.id,
+        reservationDate: date,
+        timeSlotId,
+      });
+    } catch {
+      setError("Unable to confirm your booking. Please try again.");
+      setLoadingBooking(false);
+      return;
+    }
 
     if (!result.success) {
-      setError(result.message);
+      setError(result.message ?? "Unable to confirm your booking.");
       setLoadingBooking(false);
 
       // Refresh slots because somebody may have

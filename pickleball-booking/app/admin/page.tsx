@@ -10,8 +10,17 @@ import {
   Clock,
   Eye,
   ArrowUpRight,
-  TrendingUp,
 } from "lucide-react";
+
+type TodayBooking = {
+  id: string;
+  booking_reference: string;
+  status: string;
+  total_amount: number | string;
+  profiles: { full_name: string | null; email: string | null }[];
+  courts: { name: string | null }[];
+  time_slots: { start_time: string; end_time: string }[];
+};
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
@@ -288,7 +297,7 @@ export default async function AdminDashboardPage() {
         <div className="mt-10">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-white">Today's Reservations</h3>
+              <h3 className="text-lg font-bold text-white">Today&apos;s Reservations</h3>
               <p className="text-xs text-slate-400">Schedule for {today}</p>
             </div>
             <Link
@@ -314,40 +323,8 @@ export default async function AdminDashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800">
-                    {todayBookings.map((booking: any) => (
-                      <tr
-                        key={booking.id}
-                        className="hover:bg-slate-800/40 transition duration-150"
-                      >
-                        <td className="px-6 py-4 font-mono text-xs font-medium text-lime-400">
-                          {booking.booking_reference}
-                        </td>
-                        <td className="px-6 py-4 font-medium text-white">
-                          {booking.profiles?.full_name ||
-                            booking.profiles?.email ||
-                            "Unknown"}
-                        </td>
-                        <td className="px-6 py-4">{booking.courts?.name || "-"}</td>
-                        <td className="px-6 py-4 text-slate-400">
-                          {booking.time_slots?.start_time} - {booking.time_slots?.end_time}
-                        </td>
-                        <td className="px-6 py-4 font-semibold text-white">
-                          ₱{Number(booking.total_amount).toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${
-                              booking.status === "confirmed"
-                                ? "bg-emerald-950 text-emerald-400 border-emerald-800/50"
-                                : booking.status === "cancelled"
-                                ? "bg-rose-950 text-rose-400 border-rose-800/50"
-                                : "bg-amber-950 text-amber-400 border-amber-800/50"
-                            }`}
-                          >
-                            {booking.status}
-                          </span>
-                        </td>
-                      </tr>
+                    {(todayBookings as TodayBooking[]).map((booking) => (
+                      <BookingRow key={booking.id} booking={booking} />
                     ))}
                   </tbody>
                 </table>
@@ -370,5 +347,42 @@ export default async function AdminDashboardPage() {
         © {new Date().getFullYear()} FCODES Pickleball Booking. Admin System.
       </footer>
     </main>
+  );
+}
+
+function BookingRow({ booking }: { booking: TodayBooking }) {
+  const profile = booking.profiles[0];
+  const court = booking.courts[0];
+  const timeSlot = booking.time_slots[0];
+
+  return (
+    <tr className="hover:bg-slate-800/40 transition duration-150">
+      <td className="px-6 py-4 font-mono text-xs font-medium text-lime-400">
+        {booking.booking_reference}
+      </td>
+      <td className="px-6 py-4 font-medium text-white">
+        {profile?.full_name || profile?.email || "Unknown"}
+      </td>
+      <td className="px-6 py-4">{court?.name || "-"}</td>
+      <td className="px-6 py-4 text-slate-400">
+        {timeSlot?.start_time || "-"} - {timeSlot?.end_time || "-"}
+      </td>
+      <td className="px-6 py-4 font-semibold text-white">
+        ₱{Number(booking.total_amount).toLocaleString()}
+      </td>
+      <td className="px-6 py-4">
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${
+            booking.status === "confirmed"
+              ? "bg-emerald-950 text-emerald-400 border-emerald-800/50"
+              : booking.status === "cancelled"
+                ? "bg-rose-950 text-rose-400 border-rose-800/50"
+                : "bg-amber-950 text-amber-400 border-amber-800/50"
+          }`}
+        >
+          {booking.status}
+        </span>
+      </td>
+    </tr>
   );
 }

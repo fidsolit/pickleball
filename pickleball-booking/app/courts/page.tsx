@@ -89,7 +89,7 @@ export default async function CourtsPage() {
               // Extract branch safely to avoid TS array error
               const branchData = Array.isArray(court.branches)
                 ? court.branches[0]
-                : (court.branches as any);
+                : court.branches;
 
               return (
                 <div
