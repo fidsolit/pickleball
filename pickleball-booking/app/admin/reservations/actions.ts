@@ -13,11 +13,14 @@ const allowedStatuses = [
 
 type ReservationStatus = (typeof allowedStatuses)[number];
 
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export async function updateReservationStatus(
   reservationId: string,
   status: ReservationStatus,
 ) {
-  if (!reservationId || !allowedStatuses.includes(status)) {
+  if (!uuidPattern.test(reservationId) || !allowedStatuses.includes(status)) {
     return { success: false, message: "Invalid reservation update." };
   }
 
@@ -30,20 +33,10 @@ export async function updateReservationStatus(
     return { success: false, message: "You must be logged in." };
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") {
-    return { success: false, message: "Admin access is required." };
-  }
-
-  const { error } = await supabase
-    .from("reservations")
-    .update({ status })
-    .eq("id", reservationId);
+  const { error } = await supabase.rpc("admin_update_reservation_status", {
+    p_reservation_id: reservationId,
+    p_status: status,
+  });
 
   if (error) {
     console.error("Unable to update reservation:", error);

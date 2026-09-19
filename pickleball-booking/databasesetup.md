@@ -550,6 +550,51 @@ for all
 using (public.is_admin())
 with check (public.is_admin());
 
+-- Admin reservation status changes are performed through this narrowly scoped
+-- function so the server action does not depend on broad client update access.
+create or replace function public.admin_update_reservation_status(
+    p_reservation_id uuid,
+    p_status text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as
+$$
+
+begin
+if not exists (
+select 1
+from public.profiles
+where id = auth.uid()
+and role = 'admin'
+) then
+raise exception 'Admin access is required';
+end if;
+
+    if p_status not in ('pending', 'confirmed', 'cancelled', 'completed', 'no_show') then
+        raise exception 'Invalid reservation status';
+    end if;
+
+    update public.reservations
+    set status = p_status
+    where id = p_reservation_id;
+
+    if not found then
+        raise exception 'Reservation not found';
+    end if;
+
+    return true;
+
+end;
+
+$$
+;
+
+revoke all on function public.admin_update_reservation_status(uuid, text) from public;
+grant execute on function public.admin_update_reservation_status(uuid, text) to authenticated;
+
 -- ============================================================
 -- PAYMENT POLICIES
 -- ============================================================
