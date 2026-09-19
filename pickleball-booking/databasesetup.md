@@ -408,12 +408,15 @@ stable
 set search_path = public
 as
 $$
+
     select r.time_slot_id
     from public.reservations r
     where r.court_id = p_court_id
       and r.reservation_date = p_reservation_date
       and r.status <> 'cancelled';
-$$;
+
+$$
+;
 
 revoke all on function public.booked_time_slots(uuid, date) from public;
 grant execute on function public.booked_time_slots(uuid, date) to authenticated;
@@ -457,11 +460,16 @@ using (
     or public.is_admin()
 );
 
+drop policy if exists "Users can update own profile" on public.profiles;
+
 create policy "Users can update own profile"
 on public.profiles
 for update
 using (id = auth.uid())
-with check (id = auth.uid());
+with check (
+    id = auth.uid()
+    and role = 'customer'
+);
 
 create policy "Admins manage profiles"
 on public.profiles
