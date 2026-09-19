@@ -59,9 +59,11 @@ export default function BookingForm({
     setLoadingSlots(true);
 
     try {
-      const response = await fetch(
-        `/api/availability?courtId=${court.id}&date=${selectedDate}`,
-      );
+      const query = new URLSearchParams({
+        courtId: court.id,
+        date: selectedDate,
+      });
+      const response = await fetch(`/api/availability?${query.toString()}`);
 
       const data = await response.json();
 
